@@ -23,6 +23,9 @@ public sealed class ControlService : IDisposable
     private bool _moveLeft;
     private bool _moveRight;
 
+    private bool _leftButtonHeld;
+    private bool _rightButtonHeld;
+
     public ControlService()
     {
         Keyboard.KeyEvent += OnKeyEvent;
@@ -59,12 +62,24 @@ public sealed class ControlService : IDisposable
         Keyboard.Stop();
         StopMovementTimer();
         ResetMovementState();
+        ReleaseMouseButtons();
     }
 
     private void OnKeyEvent(
         object sender,
         KeyboardInputEventArgs e)
     {
+        if (e.IsKeyDown &&
+            e.VirtualKeyCode == 0x58 &&
+            e.Control)
+        {
+            Commands.Execute(ControlCommand.ToggleControl);
+            return;
+        }
+
+        if (!IsEnabled)
+            return;
+
         switch (e.VirtualKeyCode)
         {
             case 0x57: // W
@@ -86,13 +101,32 @@ public sealed class ControlService : IDisposable
             case 0x27: // Right Arrow
                 _moveRight = e.IsKeyDown;
                 break;
-        }
 
-        if (e.IsKeyDown &&
-            e.VirtualKeyCode == 0x58 &&
-            e.Control)
-        {
-            Commands.Execute(ControlCommand.ToggleControl);
+            case 0xDB: // [
+                if (e.IsKeyDown && !_leftButtonHeld)
+                {
+                    _leftButtonHeld = true;
+                    Mouse.LeftButtonDown();
+                }
+                else if (e.IsKeyUp && _leftButtonHeld)
+                {
+                    _leftButtonHeld = false;
+                    Mouse.LeftButtonUp();
+                }
+                break;
+
+            case 0xDD: // ]
+                if (e.IsKeyDown && !_rightButtonHeld)
+                {
+                    _rightButtonHeld = true;
+                    Mouse.RightButtonDown();
+                }
+                else if (e.IsKeyUp && _rightButtonHeld)
+                {
+                    _rightButtonHeld = false;
+                    Mouse.RightButtonUp();
+                }
+                break;
         }
     }
 
@@ -115,7 +149,9 @@ public sealed class ControlService : IDisposable
                e.VirtualKeyCode == 0x25 ||
                e.VirtualKeyCode == 0x26 ||
                e.VirtualKeyCode == 0x27 ||
-               e.VirtualKeyCode == 0x28;
+               e.VirtualKeyCode == 0x28 ||
+               e.VirtualKeyCode == 0xDB ||
+               e.VirtualKeyCode == 0xDD;
     }
 
     private void ToggleControl()
@@ -130,6 +166,7 @@ public sealed class ControlService : IDisposable
         {
             StopMovementTimer();
             ResetMovementState();
+            ReleaseMouseButtons();
         }
 
         EnabledChanged?.Invoke(this, IsEnabled);
@@ -173,16 +210,20 @@ public sealed class ControlService : IDisposable
             vertical++;
 
         if (horizontal != 0)
+        {
             Commands.Execute(
                 horizontal < 0
                     ? ControlCommand.MoveLeft
                     : ControlCommand.MoveRight);
+        }
 
         if (vertical != 0)
+        {
             Commands.Execute(
                 vertical < 0
                     ? ControlCommand.MoveUp
                     : ControlCommand.MoveDown);
+        }
     }
 
     private void ResetMovementState()
@@ -191,6 +232,21 @@ public sealed class ControlService : IDisposable
         _moveDown = false;
         _moveLeft = false;
         _moveRight = false;
+    }
+
+    private void ReleaseMouseButtons()
+    {
+        if (_leftButtonHeld)
+        {
+            _leftButtonHeld = false;
+            Mouse.LeftButtonUp();
+        }
+
+        if (_rightButtonHeld)
+        {
+            _rightButtonHeld = false;
+            Mouse.RightButtonUp();
+        }
     }
 
     public void Dispose()

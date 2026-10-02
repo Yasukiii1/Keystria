@@ -12,6 +12,11 @@ public sealed class MouseInteractionEngine
     private const int SM_CXVIRTUALSCREEN = 78;
     private const int SM_CYVIRTUALSCREEN = 79;
 
+    private const uint MOUSEEVENTF_LEFTDOWN = 0x0002;
+    private const uint MOUSEEVENTF_LEFTUP = 0x0004;
+    private const uint MOUSEEVENTF_RIGHTDOWN = 0x0008;
+    private const uint MOUSEEVENTF_RIGHTUP = 0x0010;
+
     public void Move(int horizontal, int vertical)
     {
         if (horizontal == 0 && vertical == 0)
@@ -57,6 +62,32 @@ public sealed class MouseInteractionEngine
         Move(1, 0);
     }
 
+    public void LeftButtonDown()
+    {
+        mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, UIntPtr.Zero);
+    }
+
+    public void LeftButtonUp()
+    {
+        mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, UIntPtr.Zero);
+    }
+
+    public void RightButtonDown()
+    {
+        mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, UIntPtr.Zero);
+    }
+
+    public void RightButtonUp()
+    {
+        mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, UIntPtr.Zero);
+    }
+
+    public void ReleaseAllButtons()
+    {
+        LeftButtonUp();
+        RightButtonUp();
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     private struct POINT
     {
@@ -72,4 +103,12 @@ public sealed class MouseInteractionEngine
 
     [DllImport("user32.dll")]
     private static extern int GetSystemMetrics(int nIndex);
+
+    [DllImport("user32.dll")]
+    private static extern void mouse_event(
+        uint dwFlags,
+        uint dx,
+        uint dy,
+        uint dwData,
+        UIntPtr dwExtraInfo);
 }
