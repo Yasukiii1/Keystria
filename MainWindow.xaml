@@ -1,15 +1,470 @@
 ﻿<Window x:Class="KeyboardControl.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Keyboard Control"
+        Title="Keyboard Control - OFF"
         Width="450"
-        Height="300"
+        Height="360"
+        MinWidth="450"
+        MinHeight="360"
+        MaxWidth="450"
+        MaxHeight="360"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Background="White"
         Icon="Assets\icon.ico">
 
-    <Grid Background="White">
+    <Window.Resources>
+        <Style TargetType="ScrollBar">
+            <Setter Property="Width" Value="8"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Background="White"
+          Margin="18">
+
+        <!-- HOME -->
+        <Grid x:Name="HomeView">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0"
+                       Text="Welcome"
+                       FontSize="24"
+                       FontWeight="SemiBold"
+                       Foreground="Black"
+                       Margin="0,4,0,12"/>
+
+            <ScrollViewer Grid.Row="1"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+
+                <StackPanel>
+
+                    <TextBlock Text="Keyboard Control lets you control the mouse using your keyboard."
+                               FontSize="14"
+                               Foreground="#444444"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,18"/>
+
+                    <TextBlock Text="Default controls"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               Foreground="Black"
+                               Margin="0,0,0,10"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0"
+                                   Grid.Column="0"
+                                   Text="Ctrl + X"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,7"/>
+
+                        <TextBlock Grid.Row="0"
+                                   Grid.Column="1"
+                                   Text="Enable / Disable"
+                                   Margin="0,0,0,7"/>
+
+                        <TextBlock Grid.Row="1"
+                                   Grid.Column="0"
+                                   Text="W / &#x2191;"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,7"/>
+
+                        <TextBlock Grid.Row="1"
+                                   Grid.Column="1"
+                                   Text="Move Up"
+                                   Margin="0,0,0,7"/>
+
+                        <TextBlock Grid.Row="2"
+                                   Grid.Column="0"
+                                   Text="A / &#x2190;"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,7"/>
+
+                        <TextBlock Grid.Row="2"
+                                   Grid.Column="1"
+                                   Text="Move Left"
+                                   Margin="0,0,0,7"/>
+
+                        <TextBlock Grid.Row="3"
+                                   Grid.Column="0"
+                                   Text="S / &#x2193;"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,7"/>
+
+                        <TextBlock Grid.Row="3"
+                                   Grid.Column="1"
+                                   Text="Move Down"
+                                   Margin="0,0,0,7"/>
+
+                        <TextBlock Grid.Row="4"
+                                   Grid.Column="0"
+                                   Text="D / &#x2192;"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,7"/>
+
+                        <TextBlock Grid.Row="4"
+                                   Grid.Column="1"
+                                   Text="Move Right"
+                                   Margin="0,0,0,7"/>
+
+                        <TextBlock Grid.Row="5"
+                                   Grid.Column="0"
+                                   Text="Q"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,7"/>
+
+                        <TextBlock Grid.Row="5"
+                                   Grid.Column="1"
+                                   Text="Left Click"
+                                   Margin="0,0,0,7"/>
+
+                        <TextBlock Grid.Row="6"
+                                   Grid.Column="0"
+                                   Text="E"
+                                   FontWeight="SemiBold"/>
+
+                        <TextBlock Grid.Row="6"
+                                   Grid.Column="1"
+                                   Text="Right Click"/>
+                    </Grid>
+
+                </StackPanel>
+
+            </ScrollViewer>
+
+            <Button Grid.Row="2"
+                    Content="Settings"
+                    Width="90"
+                    Height="32"
+                    HorizontalAlignment="Left"
+                    Click="SettingsButton_Click"/>
+
+        </Grid>
+
+
+        <!-- SETTINGS -->
+        <Grid x:Name="SettingsView"
+              Visibility="Collapsed">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0"
+                       Text="Settings"
+                       FontSize="24"
+                       FontWeight="SemiBold"
+                       Foreground="Black"
+                       Margin="0,4,0,12"/>
+
+            <TabControl Grid.Row="1">
+
+                <!-- KEYBINDS -->
+                <TabItem Header="Keybinds">
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+
+                        <StackPanel Margin="12">
+
+                            <TextBlock Text="Keyboard Shortcuts"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,5"/>
+
+                            <TextBlock Text="Click a binding to select a new key."
+                                       Foreground="#666666"
+                                       Margin="0,0,0,15"
+                                       TextWrapping="Wrap"/>
+
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="Enable / Disable"
+                                           VerticalAlignment="Center"/>
+
+                                <Button x:Name="ToggleControlButton"
+                                        Grid.Column="1"
+                                        Content="Ctrl + X"
+                                        Tag="ToggleControl"
+                                        Click="KeybindButton_Click"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="Move Up"
+                                           VerticalAlignment="Center"/>
+
+                                <Button x:Name="MoveUpButton"
+                                        Grid.Column="1"
+                                        Content="W / &#x2191;"
+                                        Tag="MoveUp"
+                                        Click="KeybindButton_Click"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="Move Down"
+                                           VerticalAlignment="Center"/>
+
+                                <Button x:Name="MoveDownButton"
+                                        Grid.Column="1"
+                                        Content="S / &#x2193;"
+                                        Tag="MoveDown"
+                                        Click="KeybindButton_Click"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="Move Left"
+                                           VerticalAlignment="Center"/>
+
+                                <Button x:Name="MoveLeftButton"
+                                        Grid.Column="1"
+                                        Content="A / &#x2190;"
+                                        Tag="MoveLeft"
+                                        Click="KeybindButton_Click"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="Move Right"
+                                           VerticalAlignment="Center"/>
+
+                                <Button x:Name="MoveRightButton"
+                                        Grid.Column="1"
+                                        Content="D / &#x2192;"
+                                        Tag="MoveRight"
+                                        Click="KeybindButton_Click"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="Left Click"
+                                           VerticalAlignment="Center"/>
+
+                                <Button x:Name="LeftClickButton"
+                                        Grid.Column="1"
+                                        Content="Q"
+                                        Tag="LeftClick"
+                                        Click="KeybindButton_Click"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="120"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="Right Click"
+                                           VerticalAlignment="Center"/>
+
+                                <Button x:Name="RightClickButton"
+                                        Grid.Column="1"
+                                        Content="E"
+                                        Tag="RightClick"
+                                        Click="KeybindButton_Click"/>
+                            </Grid>
+
+                            <Separator Margin="0,12,0,12"/>
+
+                            <TextBlock Text="Defaults"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,6"/>
+
+                            <TextBlock Text="Restore all keybinds and mouse settings to their default values."
+                                       Foreground="#666666"
+                                       TextWrapping="Wrap"
+                                       Margin="0,0,0,12"/>
+
+                            <Button Content="Restore Defaults"
+                                    Width="130"
+                                    Height="32"
+                                    HorizontalAlignment="Left"
+                                    Click="RestoreDefaultsButton_Click"/>
+
+                        </StackPanel>
+
+                    </ScrollViewer>
+
+                </TabItem>
+
+
+                <!-- MOUSE -->
+                <TabItem Header="Mouse">
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+
+                        <StackPanel Margin="12">
+
+                            <TextBlock Text="Mouse Settings"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,15"/>
+
+                            <TextBlock Text="Mouse Speed"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,8"/>
+
+                            <Slider x:Name="MouseSpeedSlider"
+                                    Minimum="1"
+                                    Maximum="30"
+                                    Value="8"
+                                    TickFrequency="1"
+                                    IsSnapToTickEnabled="True"
+                                    ValueChanged="MouseSpeedSlider_ValueChanged"/>
+
+                            <TextBlock Text="Defaults"
+                                       FontWeight="SemiBold"
+                                       Margin="0,24,0,6"/>
+
+                            <TextBlock Text="Restore all keybinds and mouse settings to their default values."
+                                       Foreground="#666666"
+                                       TextWrapping="Wrap"
+                                       Margin="0,0,0,12"/>
+
+                            <Button Content="Restore Defaults"
+                                    Width="130"
+                                    Height="32"
+                                    HorizontalAlignment="Left"
+                                    Click="RestoreDefaultsButton_Click"/>
+
+                        </StackPanel>
+
+                    </ScrollViewer>
+
+                </TabItem>
+
+
+                <!-- MODES -->
+                <TabItem Header="Modes">
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+
+                        <StackPanel Margin="12">
+
+                            <TextBlock Text="Application Modes"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,15"/>
+
+                            <TextBlock Text="Normal"
+                                       Margin="0,0,0,8"/>
+
+                            <TextBlock Text="Mouse"
+                                       Margin="0,0,0,8"/>
+
+                            <TextBlock Text="Window"
+                                       Margin="0,0,0,8"/>
+
+                            <TextBlock Text="Text"
+                                       Margin="0,0,0,8"/>
+
+                            <TextBlock Text="Browser"
+                                       Margin="0,0,0,8"/>
+
+                            <TextBlock Text="Command"/>
+
+                        </StackPanel>
+
+                    </ScrollViewer>
+
+                </TabItem>
+
+
+                <!-- ADVANCED -->
+                <TabItem Header="Advanced">
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+
+                        <StackPanel Margin="12">
+
+                            <TextBlock Text="Advanced Settings"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,15"/>
+
+                            <CheckBox Content="Start with Windows"
+                                      Margin="0,0,0,12"/>
+
+                            <CheckBox Content="Show tray icon"
+                                      Margin="0,0,0,12"/>
+
+                            <CheckBox Content="Enable debug logging"
+                                      Margin="0,0,0,12"/>
+
+                            <Separator Margin="0,8,0,15"/>
+
+                            <TextBlock Text="More advanced options will be added here later."
+                                       Foreground="#666666"
+                                       TextWrapping="Wrap"/>
+
+                        </StackPanel>
+
+                    </ScrollViewer>
+
+                </TabItem>
+
+            </TabControl>
+
+            <Button Grid.Row="2"
+                    Content="Back"
+                    Width="80"
+                    Height="32"
+                    HorizontalAlignment="Left"
+                    Margin="0,10,0,0"
+                    Click="BackButton_Click"/>
+
+        </Grid>
+
     </Grid>
 
 </Window>

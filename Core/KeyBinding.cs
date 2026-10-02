@@ -4,12 +4,23 @@ namespace KeyboardControl.Core;
 
 public sealed class KeyBinding
 {
-    public uint VirtualKeyCode { get; }
-    public ControlCommand Command { get; }
+    public uint VirtualKeyCode { get; set; }
 
-    public KeyBinding(uint virtualKeyCode, ControlCommand command)
+    public ControlModifiers Modifiers { get; set; }
+
+    public ControlCommand Command { get; set; }
+
+    public KeyBinding()
+    {
+    }
+
+    public KeyBinding(
+        uint virtualKeyCode,
+        ControlModifiers modifiers,
+        ControlCommand command)
     {
         VirtualKeyCode = virtualKeyCode;
+        Modifiers = modifiers;
         Command = command;
     }
 }

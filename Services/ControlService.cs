@@ -10,9 +10,14 @@ namespace KeyboardControl.Services;
 public sealed class ControlService : IDisposable
 {
     public KeyboardInputEngine Keyboard { get; } = new();
+
     public CommandEngine Commands { get; } = new();
+
     public MouseInteractionEngine Mouse { get; } = new();
+
     public KeyBindingManager Bindings { get; } = new();
+
+    public SettingsStore Settings { get; } = new();
 
     public bool IsEnabled { get; private set; }
 
@@ -27,6 +32,8 @@ public sealed class ControlService : IDisposable
 
     private bool _leftButtonHeld;
     private bool _rightButtonHeld;
+
+    private Action<KeyboardInputEventArgs> _keyCaptureHandler;
 
     public ControlService()
     {
@@ -53,13 +60,10 @@ public sealed class ControlService : IDisposable
             ControlCommand.MoveRight,
             Mouse.MoveRight);
 
-        Commands.Register(
-            ControlCommand.LeftClick,
-            Mouse.LeftButtonDown);
+        AppSettings settings = Settings.Load();
 
-        Commands.Register(
-            ControlCommand.RightClick,
-            Mouse.RightButtonDown);
+        Bindings.Load(settings.Bindings);
+        Mouse.Speed = settings.MouseSpeed;
     }
 
     public void Start()
@@ -75,14 +79,37 @@ public sealed class ControlService : IDisposable
         ReleaseMouseButtons();
     }
 
+    public void BeginKeyCapture(
+        Action<KeyboardInputEventArgs> handler)
+    {
+        _keyCaptureHandler = handler;
+    }
+
+    public void EndKeyCapture()
+    {
+        _keyCaptureHandler = null;
+    }
+
     private void OnKeyEvent(
         object sender,
         KeyboardInputEventArgs e)
     {
-        // Ctrl + X = global activation toggle.
+        if (_keyCaptureHandler != null)
+        {
+            if (e.IsKeyDown)
+            {
+                _keyCaptureHandler(e);
+            }
+
+            return;
+        }
+
         if (e.IsKeyDown &&
-            e.VirtualKeyCode == 0x58 &&
-            e.Control)
+            Bindings.TryGetCommand(
+                e.VirtualKeyCode,
+                e.Modifiers,
+                out ControlCommand activationCommand) &&
+            activationCommand == ControlCommand.ToggleControl)
         {
             Commands.Execute(ControlCommand.ToggleControl);
             return;
@@ -93,9 +120,16 @@ public sealed class ControlService : IDisposable
 
         if (!Bindings.TryGetCommand(
                 e.VirtualKeyCode,
+                e.Modifiers,
                 out ControlCommand command))
         {
-            return;
+            if (!e.IsKeyUp ||
+                !Bindings.TryGetCommandByKey(
+                    e.VirtualKeyCode,
+                    out command))
+            {
+                return;
+            }
         }
 
         switch (command)
@@ -147,11 +181,14 @@ public sealed class ControlService : IDisposable
     private bool ShouldConsumeKey(
         KeyboardInputEventArgs e)
     {
-        // Always consume Ctrl + X so it does not trigger
-        // the normal Windows cut shortcut.
-        if (e.IsKeyDown &&
-            e.VirtualKeyCode == 0x58 &&
-            e.Control)
+        if (_keyCaptureHandler != null)
+            return true;
+
+        if (Bindings.TryGetCommand(
+                e.VirtualKeyCode,
+                e.Modifiers,
+                out ControlCommand command) &&
+            command == ControlCommand.ToggleControl)
         {
             return true;
         }
@@ -159,9 +196,23 @@ public sealed class ControlService : IDisposable
         if (!IsEnabled)
             return false;
 
-        return Bindings.TryGetCommand(
+        if (Bindings.TryGetCommand(
             e.VirtualKeyCode,
-            out _);
+            e.Modifiers,
+            out _))
+        {
+            return true;
+        }
+
+        if (e.IsKeyUp &&
+            Bindings.TryGetCommandByKey(
+                e.VirtualKeyCode,
+                out _))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private void ToggleControl()
@@ -179,7 +230,9 @@ public sealed class ControlService : IDisposable
             ReleaseMouseButtons();
         }
 
-        EnabledChanged?.Invoke(this, IsEnabled);
+        EnabledChanged?.Invoke(
+            this,
+            IsEnabled);
     }
 
     private void StartMovementTimer()
@@ -257,6 +310,33 @@ public sealed class ControlService : IDisposable
             _rightButtonHeld = false;
             Mouse.RightButtonUp();
         }
+    }
+
+    public void SaveSettings()
+    {
+        AppSettings settings = new()
+        {
+            MouseSpeed = Mouse.Speed,
+            Bindings = new()
+        };
+
+        foreach (KeyBinding binding in Bindings.Bindings)
+        {
+            settings.Bindings.Add(
+                new KeyBinding(
+                    binding.VirtualKeyCode,
+                    binding.Modifiers,
+                    binding.Command));
+        }
+
+        Settings.Save(settings);
+    }
+
+    public void RestoreDefaults()
+    {
+        Bindings.SetDefaults();
+        Mouse.Speed = 8;
+        SaveSettings();
     }
 
     public void Dispose()
