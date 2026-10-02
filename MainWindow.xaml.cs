@@ -314,7 +314,7 @@ public partial class MainWindow : Window
             0x13 => "Pause",
             0x14 => "Caps Lock",
             0x1B => "Escape",
-            0x20 => "Space",
+            0x20 => "Space Bar",
             0x21 => "Page Up",
             0x22 => "Page Down",
             0x23 => "End",
@@ -381,7 +381,7 @@ public partial class MainWindow : Window
                 "Left Click",
 
             ControlCommand.RightClick =>
-                "Right Click",
+                "Scroll Modifier",
 
             _ => command.ToString()
         };
