@@ -22,6 +22,8 @@ public sealed class KeyboardInputEngine : IDisposable
 
     public event EventHandler<KeyboardInputEventArgs> KeyEvent;
 
+    public Func<KeyboardInputEventArgs, bool> ShouldConsumeKey { get; set; }
+
     public KeyboardInputEngine()
     {
         _hookProc = HookCallback;
@@ -85,20 +87,19 @@ public sealed class KeyboardInputEngine : IDisposable
                 bool shift = IsKeyPressed(VK_SHIFT);
                 bool alt = IsKeyPressed(VK_MENU);
 
-                KeyEvent?.Invoke(
-                    this,
+                KeyboardInputEventArgs keyboardEvent =
                     new KeyboardInputEventArgs(
                         info.vkCode,
                         isKeyDown,
                         isKeyUp,
                         control,
                         shift,
-                        alt));
+                        alt);
 
-                // Ctrl+X is reserved for Keyboard Control.
-                if (isKeyDown &&
-                    info.vkCode == 0x58 &&
-                    control)
+                KeyEvent?.Invoke(this, keyboardEvent);
+
+                if (ShouldConsumeKey != null &&
+                    ShouldConsumeKey(keyboardEvent))
                 {
                     return (IntPtr)1;
                 }

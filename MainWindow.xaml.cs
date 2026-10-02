@@ -29,14 +29,14 @@ public partial class MainWindow : Window
     }
 
     private void OnClosed(
-        object? sender,
+        object sender,
         EventArgs e)
     {
         _controlService.Dispose();
     }
 
     private void OnEnabledChanged(
-        object? sender,
+        object sender,
         bool enabled)
     {
         Dispatcher.Invoke(() =>
