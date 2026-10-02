@@ -31,7 +31,9 @@ public sealed class ControlService : IDisposable
     private bool _moveRight;
 
     private bool _leftButtonHeld;
-    private bool _rightButtonHeld;
+    private bool _scrollModifierHeld;
+
+    private DateTime _lastScrollTime = DateTime.MinValue;
 
     private Action<KeyboardInputEventArgs> _keyCaptureHandler;
 
@@ -164,16 +166,13 @@ public sealed class ControlService : IDisposable
                 break;
 
             case ControlCommand.RightClick:
-                if (e.IsKeyDown && !_rightButtonHeld)
+                _scrollModifierHeld = e.IsKeyDown;
+
+                if (!e.IsKeyDown)
                 {
-                    _rightButtonHeld = true;
-                    Mouse.RightButtonDown();
+                    _lastScrollTime = DateTime.MinValue;
                 }
-                else if (e.IsKeyUp && _rightButtonHeld)
-                {
-                    _rightButtonHeld = false;
-                    Mouse.RightButtonUp();
-                }
+
                 break;
         }
     }
@@ -272,6 +271,31 @@ public sealed class ControlService : IDisposable
         if (_moveDown)
             vertical++;
 
+        if (_scrollModifierHeld)
+        {
+            if (horizontal == 0 && vertical == 0)
+                return;
+
+            DateTime now = DateTime.UtcNow;
+
+            if ((now - _lastScrollTime).TotalMilliseconds < 100)
+                return;
+
+            _lastScrollTime = now;
+
+            if (vertical < 0)
+                Mouse.ScrollUp();
+            else if (vertical > 0)
+                Mouse.ScrollDown();
+
+            if (horizontal < 0)
+                Mouse.ScrollLeft();
+            else if (horizontal > 0)
+                Mouse.ScrollRight();
+
+            return;
+        }
+
         if (horizontal != 0)
         {
             Commands.Execute(
@@ -295,6 +319,8 @@ public sealed class ControlService : IDisposable
         _moveDown = false;
         _moveLeft = false;
         _moveRight = false;
+        _scrollModifierHeld = false;
+        _lastScrollTime = DateTime.MinValue;
     }
 
     private void ReleaseMouseButtons()
@@ -305,11 +331,6 @@ public sealed class ControlService : IDisposable
             Mouse.LeftButtonUp();
         }
 
-        if (_rightButtonHeld)
-        {
-            _rightButtonHeld = false;
-            Mouse.RightButtonUp();
-        }
     }
 
     public void SaveSettings()
