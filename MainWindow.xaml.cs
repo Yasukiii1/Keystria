@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -70,9 +71,24 @@ public partial class MainWindow : Window
 
     private void UpdateWindowState(bool enabled)
     {
+        string version = GetAppVersion();
+
         Title = enabled
-            ? "Keystria — ON"
-            : "Keystria — OFF";
+            ? $"Keystria v{version} — ON"
+            : $"Keystria v{version} — OFF";
+    }
+
+    private static string GetAppVersion()
+    {
+        Version? version = typeof(MainWindow)
+            .Assembly
+            .GetName()
+            .Version;
+
+        if (version == null)
+            return "1.1";
+
+        return $"{version.Major}.{version.Minor}";
     }
 
     private void SettingsButton_Click(
