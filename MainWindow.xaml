@@ -1,0 +1,15 @@
+﻿<Window x:Class="KeyboardControl.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Keyboard Control"
+        Width="450"
+        Height="300"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Background="White"
+        Icon="Assets\icon.ico">
+
+    <Grid Background="White">
+    </Grid>
+
+</Window>
