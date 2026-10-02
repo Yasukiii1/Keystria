@@ -5,7 +5,7 @@
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
 
-    <AssemblyName>launcher</AssemblyName>
+    <AssemblyName>Keystria</AssemblyName>
     <RootNamespace>KeyboardControl</RootNamespace>
 
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>

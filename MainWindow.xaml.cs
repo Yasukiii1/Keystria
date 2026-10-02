@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 using KeyboardControl.Commands;
 using KeyboardControl.Core;
 using KeyboardControl.Input;
@@ -43,7 +45,8 @@ public partial class MainWindow : Window
         UpdateKeybindDisplay();
 
         MouseSpeedSlider.Value = _controlService.Mouse.Speed;
-        MouseSpeedValueButton.Content = _controlService.Mouse.Speed.ToString();
+        MouseSpeedValueButton.Content =
+            _controlService.Mouse.Speed.ToString();
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
@@ -57,29 +60,40 @@ public partial class MainWindow : Window
         _controlService.Dispose();
     }
 
-    private void OnEnabledChanged(object sender, bool enabled)
+    private void OnEnabledChanged(
+        object sender,
+        bool enabled)
     {
-        Dispatcher.Invoke(() => UpdateWindowState(enabled));
+        Dispatcher.Invoke(() =>
+            UpdateWindowState(enabled));
     }
 
     private void UpdateWindowState(bool enabled)
     {
         Title = enabled
-            ? "Keyboard Control — ON"
-            : "Keyboard Control — OFF";
+            ? "Keystria — ON"
+            : "Keystria — OFF";
     }
 
-    private void SettingsButton_Click(object sender, RoutedEventArgs e)
+    private void SettingsButton_Click(
+        object sender,
+        RoutedEventArgs e)
     {
         HomeView.Visibility = Visibility.Collapsed;
         SettingsView.Visibility = Visibility.Visible;
 
         UpdateKeybindDisplay();
-        MouseSpeedSlider.Value = _controlService.Mouse.Speed;
-        MouseSpeedValueButton.Content = _controlService.Mouse.Speed.ToString();
+
+        MouseSpeedSlider.Value =
+            _controlService.Mouse.Speed;
+
+        MouseSpeedValueButton.Content =
+            _controlService.Mouse.Speed.ToString();
     }
 
-    private void BackButton_Click(object sender, RoutedEventArgs e)
+    private void BackButton_Click(
+        object sender,
+        RoutedEventArgs e)
     {
         _controlService.EndKeyCapture();
 
@@ -87,7 +101,9 @@ public partial class MainWindow : Window
         HomeView.Visibility = Visibility.Visible;
     }
 
-    private void KeybindButton_Click(object sender, RoutedEventArgs e)
+    private void KeybindButton_Click(
+        object sender,
+        RoutedEventArgs e)
     {
         if (sender is not Button button)
             return;
@@ -95,8 +111,12 @@ public partial class MainWindow : Window
         if (button.Tag is not string commandName)
             return;
 
-        if (!Enum.TryParse(commandName, out ControlCommand command))
+        if (!Enum.TryParse(
+                commandName,
+                out ControlCommand command))
+        {
             return;
+        }
 
         button.Content = "Select keybind";
 
@@ -105,7 +125,6 @@ public partial class MainWindow : Window
             {
                 Dispatcher.Invoke(() =>
                 {
-                    // Escape cancels key selection.
                     if (keyboardEvent.VirtualKeyCode == 0x1B)
                     {
                         _controlService.EndKeyCapture();
@@ -147,10 +166,62 @@ public partial class MainWindow : Window
 
         int speed = (int)Math.Round(e.NewValue);
 
-        MouseSpeedValueButton.Content = speed.ToString();
+        MouseSpeedValueButton.Content =
+            speed.ToString();
+
+        if (IsLoaded &&
+            Math.Abs(e.NewValue - e.OldValue) > 0.001)
+        {
+            AnimateMouseSpeedValue();
+        }
 
         _controlService.Mouse.Speed = speed;
         _controlService.SaveSettings();
+    }
+
+    private void AnimateMouseSpeedValue()
+    {
+        if (MouseSpeedValueButton.RenderTransform
+            is not ScaleTransform transform)
+        {
+            return;
+        }
+
+        DoubleAnimation scaleAnimation = new(
+            1.0,
+            1.08,
+            TimeSpan.FromMilliseconds(80))
+        {
+            AutoReverse = true,
+            EasingFunction = new QuadraticEase
+            {
+                EasingMode = EasingMode.EaseOut
+            }
+        };
+
+        DoubleAnimation opacityAnimation = new(
+            1.0,
+            0.72,
+            TimeSpan.FromMilliseconds(80))
+        {
+            AutoReverse = true,
+            EasingFunction = new QuadraticEase
+            {
+                EasingMode = EasingMode.EaseOut
+            }
+        };
+
+        transform.BeginAnimation(
+            ScaleTransform.ScaleXProperty,
+            scaleAnimation);
+
+        transform.BeginAnimation(
+            ScaleTransform.ScaleYProperty,
+            scaleAnimation);
+
+        MouseSpeedValueButton.BeginAnimation(
+            UIElement.OpacityProperty,
+            opacityAnimation);
     }
 
     private void RestoreDefaultsButton_Click(
@@ -169,14 +240,19 @@ public partial class MainWindow : Window
         _controlService.EndKeyCapture();
         _controlService.RestoreDefaults();
 
-        MouseSpeedSlider.Value = _controlService.Mouse.Speed;
-        MouseSpeedValueButton.Content = _controlService.Mouse.Speed.ToString();
+        MouseSpeedSlider.Value =
+            _controlService.Mouse.Speed;
+
+        MouseSpeedValueButton.Content =
+            _controlService.Mouse.Speed.ToString();
+
         UpdateKeybindDisplay();
     }
 
     private void UpdateKeybindDisplay()
     {
-        foreach (KeyValuePair<ControlCommand, Button> entry in _keybindButtons)
+        foreach (KeyValuePair<ControlCommand, Button> entry
+                 in _keybindButtons)
         {
             List<KeyBinding> bindings =
                 _controlService.Bindings.GetBindings(entry.Key);
@@ -193,25 +269,39 @@ public partial class MainWindow : Window
         }
     }
 
-    private static string FormatBinding(KeyBinding binding)
+    private static string FormatBinding(
+        KeyBinding binding)
     {
         List<string> parts = new();
 
-        if (binding.Modifiers.HasFlag(ControlModifiers.Control))
+        if (binding.Modifiers.HasFlag(
+                ControlModifiers.Control))
+        {
             parts.Add("Ctrl");
+        }
 
-        if (binding.Modifiers.HasFlag(ControlModifiers.Shift))
+        if (binding.Modifiers.HasFlag(
+                ControlModifiers.Shift))
+        {
             parts.Add("Shift");
+        }
 
-        if (binding.Modifiers.HasFlag(ControlModifiers.Alt))
+        if (binding.Modifiers.HasFlag(
+                ControlModifiers.Alt))
+        {
             parts.Add("Alt");
+        }
 
-        parts.Add(GetKeyName(binding.VirtualKeyCode));
+        parts.Add(
+            GetKeyName(binding.VirtualKeyCode));
 
-        return string.Join(" + ", parts);
+        return string.Join(
+            " + ",
+            parts);
     }
 
-    private static string GetKeyName(uint virtualKey)
+    private static string GetKeyName(
+        uint virtualKey)
     {
         return virtualKey switch
         {
@@ -257,24 +347,42 @@ public partial class MainWindow : Window
             0xDD => "]",
             0xDE => "'",
 
-            >= 0x41 and <= 0x5A => ((char)virtualKey).ToString(),
-            >= 0x30 and <= 0x39 => ((char)virtualKey).ToString(),
+            >= 0x41 and <= 0x5A =>
+                ((char)virtualKey).ToString(),
+
+            >= 0x30 and <= 0x39 =>
+                ((char)virtualKey).ToString(),
 
             _ => $"VK {virtualKey}"
         };
     }
 
-    private static string GetCommandDisplayName(ControlCommand command)
+    private static string GetCommandDisplayName(
+        ControlCommand command)
     {
         return command switch
         {
-            ControlCommand.ToggleControl => "Enable / Disable",
-            ControlCommand.MoveUp => "Move Up",
-            ControlCommand.MoveDown => "Move Down",
-            ControlCommand.MoveLeft => "Move Left",
-            ControlCommand.MoveRight => "Move Right",
-            ControlCommand.LeftClick => "Left Click",
-            ControlCommand.RightClick => "Right Click",
+            ControlCommand.ToggleControl =>
+                "Enable / Disable",
+
+            ControlCommand.MoveUp =>
+                "Move Up",
+
+            ControlCommand.MoveDown =>
+                "Move Down",
+
+            ControlCommand.MoveLeft =>
+                "Move Left",
+
+            ControlCommand.MoveRight =>
+                "Move Right",
+
+            ControlCommand.LeftClick =>
+                "Left Click",
+
+            ControlCommand.RightClick =>
+                "Right Click",
+
             _ => command.ToString()
         };
     }
