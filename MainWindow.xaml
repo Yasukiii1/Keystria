@@ -621,6 +621,114 @@
                 </TabItem>
 
 
+                <!-- HELP -->
+                <TabItem Header="Help"
+                         Style="{StaticResource HoverScaleTabStyle}">
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+
+                        <StackPanel Margin="12">
+
+                            <TextBlock Text="How to Scroll"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,6"/>
+
+                            <TextBlock Text="Use the Space Bar as a scroll modifier."
+                                       Foreground="#444444"
+                                       TextWrapping="Wrap"
+                                       Margin="0,0,0,18"/>
+
+                            <TextBlock Text="1. Hold Space Bar"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,8"/>
+
+                            <TextBlock Text="2. While holding Space Bar, use the movement keys:"
+                                       Margin="0,0,0,10"
+                                       TextWrapping="Wrap"/>
+
+                            <Grid Margin="0,0,0,12">
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0"
+                                           Text="W / ↑"
+                                           FontWeight="SemiBold"/>
+
+                                <TextBlock Grid.Column="1"
+                                           Text="Scroll Up"/>
+
+                            </Grid>
+
+                            <Grid Margin="0,0,0,12">
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0"
+                                           Text="S / ↓"
+                                           FontWeight="SemiBold"/>
+
+                                <TextBlock Grid.Column="1"
+                                           Text="Scroll Down"/>
+
+                            </Grid>
+
+                            <Grid Margin="0,0,0,12">
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0"
+                                           Text="A / ←"
+                                           FontWeight="SemiBold"/>
+
+                                <TextBlock Grid.Column="1"
+                                           Text="Scroll Left"/>
+
+                            </Grid>
+
+                            <Grid Margin="0,0,0,18">
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0"
+                                           Text="D / →"
+                                           FontWeight="SemiBold"/>
+
+                                <TextBlock Grid.Column="1"
+                                           Text="Scroll Right"/>
+
+                            </Grid>
+
+                            <Separator Margin="0,0,0,15"/>
+
+                            <TextBlock Text="Important"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,6"/>
+
+                            <TextBlock Text="Space Bar by itself does nothing. Release Space Bar to return to normal mouse movement."
+                                       Foreground="#666666"
+                                       TextWrapping="Wrap"/>
+
+                        </StackPanel>
+
+                    </ScrollViewer>
+
+                </TabItem>
+
+
                 <!-- ADVANCED -->
                 <TabItem Header="Advanced"
                          Style="{StaticResource HoverScaleTabStyle}">
