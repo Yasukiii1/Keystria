@@ -73,9 +73,9 @@ public sealed class KeyBindingManager
             ControlCommand.LeftClick));   // Q
 
         _bindings.Add(new KeyBinding(
-            0x45,
+            0x20,
             ControlModifiers.None,
-            ControlCommand.RightClick));  // E
+            ControlCommand.RightClick));  // Space
     }
 
     public void Load(IEnumerable<KeyBinding> savedBindings)
@@ -84,11 +84,21 @@ public sealed class KeyBindingManager
 
         foreach (KeyBinding binding in savedBindings)
         {
+            uint virtualKeyCode = binding.VirtualKeyCode;
+
+            // Migrate the old default Right Click key (E)
+            // to the new default Scroll Modifier key (Space).
+            if (binding.Command == ControlCommand.RightClick &&
+                virtualKeyCode == 0x45)
+            {
+                virtualKeyCode = 0x20;
+            }
+
             bool conflict = false;
 
             foreach (KeyBinding existing in _bindings)
             {
-                if (existing.VirtualKeyCode == binding.VirtualKeyCode &&
+                if (existing.VirtualKeyCode == virtualKeyCode &&
                     existing.Command != binding.Command)
                 {
                     conflict = true;
@@ -98,7 +108,10 @@ public sealed class KeyBindingManager
 
             if (!conflict)
             {
-                _bindings.Add(binding);
+                _bindings.Add(new KeyBinding(
+                    virtualKeyCode,
+                    binding.Modifiers,
+                    binding.Command));
             }
         }
 
