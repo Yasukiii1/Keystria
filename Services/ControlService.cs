@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using KeyboardControl.Commands;
+using KeyboardControl.Core;
 using KeyboardControl.Input;
 using KeyboardControl.Interaction;
 
@@ -11,6 +12,7 @@ public sealed class ControlService : IDisposable
     public KeyboardInputEngine Keyboard { get; } = new();
     public CommandEngine Commands { get; } = new();
     public MouseInteractionEngine Mouse { get; } = new();
+    public KeyBindingManager Bindings { get; } = new();
 
     public bool IsEnabled { get; private set; }
 
@@ -50,6 +52,14 @@ public sealed class ControlService : IDisposable
         Commands.Register(
             ControlCommand.MoveRight,
             Mouse.MoveRight);
+
+        Commands.Register(
+            ControlCommand.LeftClick,
+            Mouse.LeftButtonDown);
+
+        Commands.Register(
+            ControlCommand.RightClick,
+            Mouse.RightButtonDown);
     }
 
     public void Start()
@@ -69,6 +79,7 @@ public sealed class ControlService : IDisposable
         object sender,
         KeyboardInputEventArgs e)
     {
+        // Ctrl + X = global activation toggle.
         if (e.IsKeyDown &&
             e.VirtualKeyCode == 0x58 &&
             e.Control)
@@ -80,29 +91,32 @@ public sealed class ControlService : IDisposable
         if (!IsEnabled)
             return;
 
-        switch (e.VirtualKeyCode)
+        if (!Bindings.TryGetCommand(
+                e.VirtualKeyCode,
+                out ControlCommand command))
         {
-            case 0x57: // W
-            case 0x26: // Up Arrow
+            return;
+        }
+
+        switch (command)
+        {
+            case ControlCommand.MoveUp:
                 _moveUp = e.IsKeyDown;
                 break;
 
-            case 0x53: // S
-            case 0x28: // Down Arrow
+            case ControlCommand.MoveDown:
                 _moveDown = e.IsKeyDown;
                 break;
 
-            case 0x41: // A
-            case 0x25: // Left Arrow
+            case ControlCommand.MoveLeft:
                 _moveLeft = e.IsKeyDown;
                 break;
 
-            case 0x44: // D
-            case 0x27: // Right Arrow
+            case ControlCommand.MoveRight:
                 _moveRight = e.IsKeyDown;
                 break;
 
-            case 0xDB: // [
+            case ControlCommand.LeftClick:
                 if (e.IsKeyDown && !_leftButtonHeld)
                 {
                     _leftButtonHeld = true;
@@ -115,7 +129,7 @@ public sealed class ControlService : IDisposable
                 }
                 break;
 
-            case 0xDD: // ]
+            case ControlCommand.RightClick:
                 if (e.IsKeyDown && !_rightButtonHeld)
                 {
                     _rightButtonHeld = true;
@@ -130,8 +144,11 @@ public sealed class ControlService : IDisposable
         }
     }
 
-    private bool ShouldConsumeKey(KeyboardInputEventArgs e)
+    private bool ShouldConsumeKey(
+        KeyboardInputEventArgs e)
     {
+        // Always consume Ctrl + X so it does not trigger
+        // the normal Windows cut shortcut.
         if (e.IsKeyDown &&
             e.VirtualKeyCode == 0x58 &&
             e.Control)
@@ -142,16 +159,9 @@ public sealed class ControlService : IDisposable
         if (!IsEnabled)
             return false;
 
-        return e.VirtualKeyCode == 0x57 ||
-               e.VirtualKeyCode == 0x53 ||
-               e.VirtualKeyCode == 0x41 ||
-               e.VirtualKeyCode == 0x44 ||
-               e.VirtualKeyCode == 0x25 ||
-               e.VirtualKeyCode == 0x26 ||
-               e.VirtualKeyCode == 0x27 ||
-               e.VirtualKeyCode == 0x28 ||
-               e.VirtualKeyCode == 0xDB ||
-               e.VirtualKeyCode == 0xDD;
+        return Bindings.TryGetCommand(
+            e.VirtualKeyCode,
+            out _);
     }
 
     private void ToggleControl()
