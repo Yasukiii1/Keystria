@@ -43,7 +43,6 @@ public partial class MainWindow : Window
         UpdateKeybindDisplay();
 
         MouseSpeedSlider.Value = _controlService.Mouse.Speed;
-        MouseSpeedValueButton.Content = _controlService.Mouse.Speed.ToString();
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
@@ -76,7 +75,6 @@ public partial class MainWindow : Window
 
         UpdateKeybindDisplay();
         MouseSpeedSlider.Value = _controlService.Mouse.Speed;
-        MouseSpeedValueButton.Content = _controlService.Mouse.Speed.ToString();
     }
 
     private void BackButton_Click(object sender, RoutedEventArgs e)
@@ -147,8 +145,6 @@ public partial class MainWindow : Window
 
         int speed = (int)Math.Round(e.NewValue);
 
-        MouseSpeedValueButton.Content = speed.ToString();
-
         _controlService.Mouse.Speed = speed;
         _controlService.SaveSettings();
     }
@@ -170,7 +166,6 @@ public partial class MainWindow : Window
         _controlService.RestoreDefaults();
 
         MouseSpeedSlider.Value = _controlService.Mouse.Speed;
-        MouseSpeedValueButton.Content = _controlService.Mouse.Speed.ToString();
         UpdateKeybindDisplay();
     }
 
