@@ -14,8 +14,10 @@ public sealed class MouseInteractionEngine
 
     private const uint MOUSEEVENTF_LEFTDOWN = 0x0002;
     private const uint MOUSEEVENTF_LEFTUP = 0x0004;
-    private const uint MOUSEEVENTF_RIGHTDOWN = 0x0008;
-    private const uint MOUSEEVENTF_RIGHTUP = 0x0010;
+    private const uint MOUSEEVENTF_WHEEL = 0x0800;
+    private const uint MOUSEEVENTF_HWHEEL = 0x1000;
+
+    private const int WHEEL_DELTA = 120;
 
     public void Move(int horizontal, int vertical)
     {
@@ -72,20 +74,29 @@ public sealed class MouseInteractionEngine
         mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, UIntPtr.Zero);
     }
 
-    public void RightButtonDown()
+    public void ScrollUp()
     {
-        mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, UIntPtr.Zero);
+        mouse_event(MOUSEEVENTF_WHEEL, 0, 0, unchecked((uint)WHEEL_DELTA), UIntPtr.Zero);
     }
 
-    public void RightButtonUp()
+    public void ScrollDown()
     {
-        mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, UIntPtr.Zero);
+        mouse_event(MOUSEEVENTF_WHEEL, 0, 0, unchecked((uint)-WHEEL_DELTA), UIntPtr.Zero);
+    }
+
+    public void ScrollLeft()
+    {
+        mouse_event(MOUSEEVENTF_HWHEEL, 0, 0, unchecked((uint)-WHEEL_DELTA), UIntPtr.Zero);
+    }
+
+    public void ScrollRight()
+    {
+        mouse_event(MOUSEEVENTF_HWHEEL, 0, 0, unchecked((uint)WHEEL_DELTA), UIntPtr.Zero);
     }
 
     public void ReleaseAllButtons()
     {
         LeftButtonUp();
-        RightButtonUp();
     }
 
     [StructLayout(LayoutKind.Sequential)]
