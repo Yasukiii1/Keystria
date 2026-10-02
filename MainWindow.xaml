@@ -326,12 +326,12 @@
 
                         <TextBlock Grid.Row="6"
                                    Grid.Column="0"
-                                   Text="E"
+                                   Text="Space Bar"
                                    FontWeight="SemiBold"/>
 
                         <TextBlock Grid.Row="6"
                                    Grid.Column="1"
-                                   Text="Right Click"/>
+                                   Text="Scroll Modifier"/>
 
                     </Grid>
 
@@ -518,12 +518,12 @@
                                     <ColumnDefinition Width="120"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="Right Click"
+                                <TextBlock Text="Scroll Modifier"
                                            VerticalAlignment="Center"/>
 
                                 <Button x:Name="RightClickButton"
                                         Grid.Column="1"
-                                        Content="E"
+                                        Content="Space Bar"
                                         Tag="RightClick"
                                         Click="KeybindButton_Click"
                                         Style="{StaticResource HoverScaleButtonStyle}"/>
